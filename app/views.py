@@ -102,6 +102,7 @@ def register():
 def get_csrf():
     return jsonify({'csrf_token': generate_csrf()})
 
+
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     try:
@@ -109,16 +110,13 @@ def login():
         password = request.form.get('password')
         csrf_token = request.headers.get('X-CSRFToken')
 
-        # CSRF validation (if you're using Flask-WTF)
         try:
             validate_csrf(csrf_token)
         except CSRFError:
             return jsonify({'message': 'Invalid CSRF token'}), 400
 
-        # Fetch user from database
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            # Store user ID in the session (or you can store a session token)
             session['user_id'] = user.id
             return jsonify({'message': 'Login successful', 'user': user.to_dict()}), 200
         else:
@@ -128,6 +126,8 @@ def login():
         print(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
     
+
+
 @app.after_request
 def add_header(response):
     """
