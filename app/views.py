@@ -125,7 +125,25 @@ def login():
     except Exception as e:
         print(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
-    
+
+######NEED TO CHECK THIS-----------------------------------------------------------------
+# @app.route('/api/auth/logout', methods=['POST'])
+# def logout():
+#     session.pop('user_id', None)
+#     return jsonify({'message': 'Logged out successfully'}), 200
+
+# @app.route('/api/user', methods=['GET'])
+# def get_user_profile():
+#     user_id = session.get('user_id')
+#     if not user_id:
+#         return jsonify({'message': 'Not authenticated'}), 401
+
+#     user = User.query.get(user_id)
+#     if user:
+#         return jsonify(user.to_dict())
+#     else:
+#         return jsonify({'message': 'User not found'}), 404
+######NEED TO CHECK THIS-------------------------------------------------------------------------
 
 
 @app.after_request

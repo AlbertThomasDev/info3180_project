@@ -63,7 +63,7 @@
 
     try {
       // Send login request
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         body: formData,
         headers: {
