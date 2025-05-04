@@ -1,4 +1,5 @@
 <template>
+    <button class="back-button" @click="goBack">← Back</button>
     <form @submit.prevent="handleSubmit" class="profile-form">
       <div>
         <label>Description:</label>
@@ -140,6 +141,11 @@
             }
         }
     };
+    
+    function goBack() {
+        window.history.length > 1 ? window.history.back() : window.location.href = '/';
+    }
+    
 </script>
   
 <style scoped>

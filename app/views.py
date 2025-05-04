@@ -134,7 +134,7 @@ def logout():
 
 @app.route('/api/users/<int:user_id>', methods=['GET'])
 def get_user_profile(user_id):
-    user_id = session.get('user_id')
+    # user_id = session.get('user_id')
     if not user_id:
         return jsonify({'message': 'Not authenticated'}), 401
 
@@ -145,10 +145,10 @@ def get_user_profile(user_id):
         return jsonify({'message': 'User not found'}), 404
     
 #New ---------------------------------------------------------------------------------
-# @app.route('/api/profiles', methods=['GET'])
-# def get_all_profiles():
-#     profiles = Profile.query.all()
-#     return jsonify([profile.to_dict() for profile in profiles]), 200
+@app.route('/api/profiles', methods=['GET'])
+def get_all_profiles():
+    profiles = Profile.query.all()
+    return jsonify([profile.to_dict() for profile in profiles]), 200
 
 @app.route('/api/profiles', methods=['POST'])
 def add_profile():
@@ -195,6 +195,31 @@ def get_profiles_by_user(user_id):
         return jsonify({'error': 'No profiles found for this user'}), 404
     return jsonify([profile.to_dict() for profile in profiles]), 200
 
+# Implement this
+@app.route('/api/search', methods=['GET'])
+def search_profiles():
+    pass
+
+@app.route('/api/profiles/<int:fav_user_id>/favourite', methods=['POST'])
+def add_to_favourites(fav_user_id):
+    data = request.get_json()
+    user_id = session.get('user_id')
+
+    if not user_id:
+        return jsonify({'error': 'Missing user_id'}), 400
+
+    # Check if the profile is already in the favourites
+    existing_favourite = Favourite.query.filter_by(user_id_fk=user_id, fav_user_id_fk=fav_user_id).first()
+    
+    if existing_favourite:
+        return jsonify({'message': 'Profile already in favourites'}), 200  # Or 409 Conflict
+
+    # If not, add to favourites
+    favourite = Favourite(user_id_fk=user_id, fav_user_id_fk=fav_user_id)
+    db.session.add(favourite)
+    db.session.commit()
+
+    return jsonify({'message': 'Added to favourites'}), 201
 
 @app.after_request
 def add_header(response):

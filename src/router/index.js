@@ -6,6 +6,7 @@ import UserView from '../views/UserView.vue'
 
 import ProfileDetailsView from '../views/ProfileDetailsView.vue'
 import NewProfileView from '../views/NewProfileView.vue'
+import ShowAllProfiles from '../views/ShowAllProfiles.vue'
 
 
 const router = createRouter({
@@ -16,7 +17,8 @@ const router = createRouter({
     { path:'/register', name: 'register', component: UserRegisterView },
     { path: '/users/:userId', name: 'userview', component: UserView },
     { path: '/profiles/new', name: 'newprofile', component: NewProfileView },
-    { path: '/profiles/:profile_id', name: 'profileview', component: ProfileDetailsView }
+    { path: '/profiles/:profile_id', name: 'profileview', component: ProfileDetailsView },
+    { path: '/profiles', name: 'profiles', component: ShowAllProfiles }
     
     
     // { path: '/reports', name: 'reports', component: AppReports }

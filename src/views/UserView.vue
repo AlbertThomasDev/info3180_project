@@ -1,7 +1,8 @@
 <template>
     <div class="action-buttons">
       <button @click="createProfile" class="btn-create-profile">Create Profile</button>
-      <button @click="viewProfiles" class="btn-view-profiles">View Profile</button>
+      <button @click="viewProfiles" class="btn-view-profiles">My Profiles</button>
+      <button @click="viewAllProfiles" class="btn-view-profiles">All Profiles</button>
       <button @click="viewReport" class="btn-report">View Report</button>
       <button @click="logout" class="btn-logout">Log Out</button>
     </div>
@@ -12,10 +13,7 @@
         <p><strong>Joined:</strong> {{ new Date(user.date_joined).toLocaleDateString() }}</p>
     
     </div>
-
-
-    
-  </template>
+</template>
   
 <script setup>
     import axios from 'axios'
@@ -52,6 +50,10 @@
 
     const viewProfiles = () => {
         router.push("/profiles/" + userId) // Navigate to profile details view
+    }
+
+    const viewAllProfiles = () => {
+        router.push("/profiles") // Navigate to profile details view
     }
 
     // Method for logout
@@ -113,6 +115,25 @@
   color: white;
   transition: background-color 0.3s ease;
 }
+
+/* .search-bar {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+} */
 
 .action-buttons button:hover {
   background-color: #45a049;
