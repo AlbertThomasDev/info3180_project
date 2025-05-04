@@ -8,7 +8,7 @@
         <input type="password" v-model="password" placeholder="Password" required>
         <button type="submit">Login</button>
       </form>
-      <!-- <p v-if="message">{{ message }}</p> -->
+      <p v-if="message">{{ message }}</p>
     </div>
   </div>
 </template>
@@ -22,6 +22,8 @@
   const message = ref('');
   const errors = ref([]);
   const csrf_token = ref('');
+
+  const user = ref({})
 
   // Fetch CSRF token
   const getCsrfToken = async () => {
@@ -45,6 +47,8 @@
   });
 
   // Login function
+
+  
   const login_user = async () => {
     // Clear any previous messages
     message.value = '';
@@ -71,13 +75,18 @@
         },
       });
 
+      
       const data = await response.json();
       
       if (response.ok) {
         // Handle successful login
+
+        user.value = data.user  
+        console.log(user.value.id)
+        sessionStorage.setItem('user_id', user.value.id)
         message.value = 'Login successful!';
-        // Optionally, redirect after login (e.g., to a dashboard)
-        setTimeout(() => {window.location.href = '/user'; }, 2000);
+  
+        setTimeout(() => {window.location.href = '/users/' + user.value.id}, 2000);
       } else {
         // Handle login error
         errors.value = data.errors || [data.message || 'Login failed.'];

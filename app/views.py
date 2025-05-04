@@ -4,7 +4,7 @@ Jinja2 Documentation:    https://jinja.palletsprojects.com/
 Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file creates your application.
 """
-from flask import Flask, request, jsonify, render_template, send_file, session
+from flask import Flask, request, jsonify, render_template, send_file, session, send_from_directory
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from app import app, db
@@ -126,24 +126,74 @@ def login():
         print(f"Error during login: {e}")
         return jsonify({'message': 'Internal server error'}), 500
 
-######NEED TO CHECK THIS-----------------------------------------------------------------
-# @app.route('/api/auth/logout', methods=['POST'])
-# def logout():
-#     session.pop('user_id', None)
-#     return jsonify({'message': 'Logged out successfully'}), 200
 
-# @app.route('/api/user', methods=['GET'])
-# def get_user_profile():
-#     user_id = session.get('user_id')
-#     if not user_id:
-#         return jsonify({'message': 'Not authenticated'}), 401
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({'message': 'Logged out successfully'}), 200
 
-#     user = User.query.get(user_id)
-#     if user:
-#         return jsonify(user.to_dict())
-#     else:
-#         return jsonify({'message': 'User not found'}), 404
-######NEED TO CHECK THIS-------------------------------------------------------------------------
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user_profile(user_id):
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'message': 'Not authenticated'}), 401
+
+    user = User.query.get(user_id)
+    if user:
+        return jsonify(user.to_dict())
+    else:
+        return jsonify({'message': 'User not found'}), 404
+    
+#New ---------------------------------------------------------------------------------
+# @app.route('/api/profiles', methods=['GET'])
+# def get_all_profiles():
+#     profiles = Profile.query.all()
+#     return jsonify([profile.to_dict() for profile in profiles]), 200
+
+@app.route('/api/profiles', methods=['POST'])
+def add_profile():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'Missing profile data'}), 400
+    
+    user_id=session.get('user_id')
+    existing_profiles_count = Profile.query.filter_by(user_id_fk=user_id).count()
+    if existing_profiles_count >= 3:
+        return jsonify({'message': 'Profile limit reached. You can only create up to 3 profiles.'}), 403
+
+    try:
+        new_profile = Profile(
+            user_id_fk=session.get('user_id'), 
+            description=data['description'],
+            parish=data['parish'],
+            biography=data['biography'],
+            sex=data['sex'],
+            race=data['race'],
+            birth_year=data['birth_year'],
+            height=data['height'],
+            fav_cuisine=data['fav_cuisine'],
+            fav_colour=data['fav_colour'],
+            fav_school_subject=data['fav_school_subject'],
+            political=data['political'],
+            religious=data['religious'],
+            family_oriented=data['family_oriented']
+        )
+
+        
+        db.session.add(new_profile)
+        db.session.commit()
+        return jsonify(new_profile.to_dict()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+# @app.route('/api/profiles/<int:profile_id>', methods=['GET'])
+# def get_profile(profile_id):
+#     profile = Profile.query.get(profile_id).All()
+#     if not profile:
+#         return jsonify({'error': 'Profile not found'}), 404
+#     return jsonify(profile.to_dict()), 200
 
 
 @app.after_request

@@ -12,7 +12,7 @@
         <button type="submit">Register</button>
       </form>
 
-      <!-- <p v-if="message" :style="{ color: error ? 'red' : 'green' }">{{ message }}</p> -->
+      <p v-if="message" :style="{ color: error ? 'red' : 'green' }">{{ message }}</p>
     </div>
   </div>
 </template>
