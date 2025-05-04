@@ -35,11 +35,9 @@
         router.push('/profiles/new')
     }
 
-
-    // Method to generate the image URL for the profile photo
     const getPhotoUrl = (filename) => {
         console.log(`pic_uploads/${filename}`)
-        return `/pic_uploads/${filename}` // Adjust path to match your server's static route
+        return `/pic_uploads/${filename}` 
     }
 
     // Fetch user data on component mount
@@ -53,7 +51,7 @@
     })
 
     const viewProfiles = () => {
-        router.push("/profiles/") // Navigate to profile details view
+        router.push("/profiles/" + userId) // Navigate to profile details view
     }
 
     // Method for logout

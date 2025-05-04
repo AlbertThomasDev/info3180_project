@@ -188,12 +188,12 @@ def add_profile():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
-# @app.route('/api/profiles/<int:profile_id>', methods=['GET'])
-# def get_profile(profile_id):
-#     profile = Profile.query.get(profile_id).All()
-#     if not profile:
-#         return jsonify({'error': 'Profile not found'}), 404
-#     return jsonify(profile.to_dict()), 200
+@app.route('/api/profiles/<int:user_id>', methods=['GET'])
+def get_profiles_by_user(user_id):
+    profiles = Profile.query.filter_by(user_id_fk=user_id).all()
+    if not profiles:
+        return jsonify({'error': 'No profiles found for this user'}), 404
+    return jsonify([profile.to_dict() for profile in profiles]), 200
 
 
 @app.after_request
