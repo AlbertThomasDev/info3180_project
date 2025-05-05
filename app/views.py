@@ -198,7 +198,27 @@ def get_profiles_by_user(user_id):
 # Implement this
 @app.route('/api/search', methods=['GET'])
 def search_profiles():
-    pass
+    query = request.args.get('q', '').lower()
+
+    profiles = Profile.query.join(User).all()
+    results = []
+
+    for profile in profiles:
+        user = profile.user
+        if (query in (user.name or '').lower() or
+            query in (profile.sex or '').lower() or
+            query in (profile.race or '').lower() or
+            query in str(profile.birth_year)):
+            
+            results.append({
+                **profile.to_dict(),
+                'user': {
+                    'name': user.name,
+                    'photo': user.photo
+                }
+            })
+
+    return jsonify(results)
 
 @app.route('/api/profiles/<int:fav_user_id>/favourite', methods=['POST'])
 def add_to_favourites(fav_user_id):
@@ -220,6 +240,17 @@ def add_to_favourites(fav_user_id):
     db.session.commit()
 
     return jsonify({'message': 'Added to favourites'}), 201
+
+@app.route('/api/users/<int:user_id>/favourites', methods=['GET'])
+def get_user_favourites(user_id):
+    favourites = Favourite.query.filter_by(user_id_fk=user_id).all()
+    if not favourites:
+        return jsonify([])
+
+    # Now fetch the user info for each fav_user_id_fk
+    fav_users = User.query.filter(User.id.in_([fav.fav_user_id_fk for fav in favourites])).all()
+    return jsonify([user.to_dict() for user in fav_users]), 200
+
 
 @app.after_request
 def add_header(response):

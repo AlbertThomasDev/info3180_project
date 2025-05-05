@@ -28,6 +28,20 @@
         <p>Loading profiles...</p>
       </div>
     </div>
+    <div v-if="favourites.length" class="favourites-section">
+    <h3>Favourited Users</h3>
+    <ul>
+        <li v-for="user in favourites" :key="user.id">
+        <img
+            v-if="user.photo"
+            :src="`/pic_uploads/${user.photo}`"
+            alt="User photo"
+            class="fav-user-photo"
+        />
+        {{ user.name }}
+        </li>
+    </ul>
+    </div>
   </template>
   
 <script>
@@ -40,15 +54,20 @@
         data() {
         return {
             profiles: [],
+            favourites: [],
             error: null,
         };
         },
         async created() {
         try {
-            const response = await axios.get(`/api/profiles/${userId}`);
-            this.profiles = response.data;
+            const profileRes = await axios.get(`/api/profiles/${userId}`);
+            this.profiles = profileRes.data;
+
+            const favRes = await axios.get(`/api/users/${userId}/favourites`);
+            this.favourites = favRes.data;
+
         } catch (err) {
-            this.error = err.response?.data?.error || 'Error fetching profiles';
+            this.error = err.response?.data?.error || 'Error fetching data';
         }
         },
         methods: {
@@ -101,6 +120,21 @@
   color: #555;
   text-align: center;
   margin-top: 2rem;
+}
+
+.favourites-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.fav-user-photo {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 </style>
   

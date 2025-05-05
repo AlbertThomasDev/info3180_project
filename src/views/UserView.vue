@@ -13,43 +13,85 @@
         <p><strong>Joined:</strong> {{ new Date(user.date_joined).toLocaleDateString() }}</p>
     
     </div>
+    
+    <!-- Search Bar -->
+    <div class="mb-4">
+    <input
+        v-model="searchQuery"
+        type="text"
+        class="form-control"
+        placeholder="Search by name, birth year, sex, or race"
+    />
+    </div>
+
+    <!-- Loading Spinner -->
+    <div v-if="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+    </div>
+
+    <!-- Error Message -->
+    <div v-else-if="error" class="alert alert-danger">
+    {{ error }}
+    </div>
+
+    <!-- Profiles List -->
+    <div v-else>
+    <div class="row">
+        <div
+        class="col-md-4 mb-4"
+        v-for="profile in filteredProfiles.slice(0, 4)"
+        :key="profile.id"
+        >
+        <div class="card h-100">
+            <img
+            :src="getPhotoUrl(profile.user.photo)"
+            class="card-img-top"
+            alt="Profile Photo"
+            style="object-fit: cover; height: 200px;"
+            />
+            <div class="card-body">
+            <h5 class="card-title">{{ profile.user.name }}</h5>
+            <p class="card-text">{{ profile.description?.slice(0, 100) }}...</p>
+            <router-link
+                :to="`/profiles/${profile.user_id_fk}`"
+                class="btn btn-outline-primary btn-sm"
+            >
+                View Details
+            </router-link>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div v-if="filteredProfiles.length === 0" class="text-muted">
+        No profiles found.
+    </div>
+    </div>
+
 </template>
   
 <script setup>
     import axios from 'axios'
-    import { onMounted, ref } from 'vue'
+    import { onMounted, ref, computed } from 'vue'
     import { useRouter, useRoute } from 'vue-router'
-    
 
     const user = ref({})
+    const profiles = ref([])
+    const searchQuery = ref('')
+    const loading = ref(false)
+    const error = ref('')
     const router = useRouter()
-    
     const route = useRoute()
     const userId = route.params.userId
-    console.log(userId);
-
 
     const createProfile = () => {
-        router.push('/profiles/new')
+            router.push('/profiles/new')
     }
-
-    const getPhotoUrl = (filename) => {
-        console.log(`pic_uploads/${filename}`)
-        return `/pic_uploads/${filename}` 
-    }
-
-    // Fetch user data on component mount
-    onMounted(async () => {
-        try {
-            const response = await axios.get(`/api/users/${userId}`)  // Fetching user data based on dynamic userId
-            user.value = response.data
-        } catch (err) {
-            console.error('Failed to fetch user:', err)
-        }
-    })
 
     const viewProfiles = () => {
-        router.push("/profiles/" + userId) // Navigate to profile details view
+            router.push("/profiles/" + userId) // Navigate to profile details view
     }
 
     const viewAllProfiles = () => {
@@ -87,7 +129,50 @@
             console.error('Logout failed:', error)
         }
     }
+
+const getPhotoUrl = (filename) => {
+    return `/pic_uploads/${filename}`
+}
+
+const fetchUser = async () => {
+    try {
+        const response = await axios.get(`/api/users/${userId}`)
+        user.value = response.data
+    } catch (err) {
+        console.error('Failed to fetch user:', err)
+    }
+}
+
+const fetchProfiles = async () => {
+    try {
+        loading.value = true
+        const response = await axios.get('/api/search')
+        profiles.value = response.data
+    } catch (err) {
+        console.error('Failed to fetch profiles:', err)
+        error.value = 'Failed to load profiles.'
+    } finally {
+        loading.value = false
+    }
+}
+
+const filteredProfiles = computed(() => {
+    if (!searchQuery.value) return profiles.value
+    const q = searchQuery.value.toLowerCase()
+    return profiles.value.filter((p) =>
+        (p.user?.name || '').toLowerCase().includes(q) ||
+        (p.sex || '').toLowerCase().includes(q) ||
+        (p.race || '').toLowerCase().includes(q) ||
+        String(p.birth_year).includes(q)
+    )
+})
+
+onMounted(() => {
+    fetchUser()
+    fetchProfiles()
+})
 </script>
+
 
 
 
