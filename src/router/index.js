@@ -7,6 +7,8 @@ import UserView from '../views/UserView.vue'
 import ProfileDetailsView from '../views/ProfileDetailsView.vue'
 import NewProfileView from '../views/NewProfileView.vue'
 import ShowAllProfiles from '../views/ShowAllProfiles.vue'
+import MatchMeView from '../views/MatchMeView.vue'
+import Top20Fav from '../views/Top20Fav.vue'
 
 
 const router = createRouter({
@@ -18,10 +20,9 @@ const router = createRouter({
     { path: '/users/:userId', name: 'userview', component: UserView },
     { path: '/profiles/new', name: 'newprofile', component: NewProfileView },
     { path: '/profiles/:profile_id', name: 'profileview', component: ProfileDetailsView },
-    { path: '/profiles', name: 'profiles', component: ShowAllProfiles }
-    
-    
-    // { path: '/reports', name: 'reports', component: AppReports }
+    { path: '/profiles', name: 'profiles', component: ShowAllProfiles },
+    { path: '/matchme', name: 'matchme', component: MatchMeView},
+    { path: '/top20fav', name: 'top20fav', component: Top20Fav }
 
   ]
 })

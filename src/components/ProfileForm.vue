@@ -155,5 +155,67 @@
         display: grid;
         gap: 1rem;
     }
+    .profile-form {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .profile-form div {
+        margin-bottom: 1.25rem;
+    }
+
+    .profile-form label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .profile-form input[type="text"],
+    .profile-form input[type="number"],
+    .profile-form select,
+    .profile-form textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+
+    .profile-form textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .profile-form input[type="checkbox"] {
+        margin-right: 0.5rem;
+        transform: scale(1.1);
+    }
+
+    .profile-form button[type="submit"] {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .profile-form button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    
+
+    
 </style>
-  

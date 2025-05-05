@@ -1,11 +1,12 @@
 <template>
     <div class="action-buttons">
-      <button @click="createProfile" class="btn-create-profile">Create Profile</button>
-      <button @click="viewProfiles" class="btn-view-profiles">My Profiles</button>
-      <button @click="viewAllProfiles" class="btn-view-profiles">All Profiles</button>
-      <button @click="viewReport" class="btn-report">View Report</button>
-      <button @click="logout" class="btn-logout">Log Out</button>
-    </div>
+        <button @click="matchme" class="btn-match-me">Match Me</button>
+        <button @click="createProfile" class="btn-create-profile">Create Profile</button>
+        <button @click="viewProfiles" class="btn-view-profiles">My Profiles</button>
+        <button @click="viewAllProfiles" class="btn-view-profiles">All Profiles</button>
+        <button @click="viewtop20fav" class="btn-report">Top 20 Favourited</button>
+        <button @click="logout" class="btn-logout">Log Out</button>
+        </div>
     <div class="user-view">
         <img :src="getPhotoUrl(user.photo)" alt="User Photo" class="user-photo" v-if="user.photo" />
         <h1>{{ user.name }}'s Profile</h1>
@@ -85,6 +86,14 @@
     const router = useRouter()
     const route = useRoute()
     const userId = route.params.userId
+
+    const viewtop20fav = () => {
+            router.push('/top20fav')
+    }
+
+    const matchme = () => {
+            router.push('/matchme')
+    }
 
     const createProfile = () => {
             router.push('/profiles/new')

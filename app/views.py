@@ -251,6 +251,64 @@ def get_user_favourites(user_id):
     fav_users = User.query.filter(User.id.in_([fav.fav_user_id_fk for fav in favourites])).all()
     return jsonify([user.to_dict() for user in fav_users]), 200
 
+@app.route('/api/users/favourites/<int:N>', methods=['GET'])
+def get_top_favoured_users(N):
+    from sqlalchemy import func
+
+    # Count how many times each user has been favourited
+    results = (
+        db.session.query(Favourite.fav_user_id_fk, func.count(Favourite.id).label('count'))
+        .group_by(Favourite.fav_user_id_fk)
+        .order_by(func.count(Favourite.id).desc())
+        .limit(N)
+        .all()
+    )
+
+    # Fetch user data for each favoured user
+    users = []
+    for user_id, count in results:
+        user = User.query.get(user_id)
+        if user:
+            user_dict = user.to_dict()
+            user_dict['favourites_count'] = count
+            users.append(user_dict)
+
+    return jsonify(users), 200
+
+@app.route('/api/profiles/matches/<int:profile_id>', methods=['GET'])
+def get_matching_profiles(profile_id):
+    current_profile = Profile.query.get(profile_id)
+    if not current_profile:
+        return jsonify({'error': 'Profile not found'}), 404
+
+    all_profiles = Profile.query.filter(Profile.id != profile_id).all()
+    matches = []
+
+    for profile in all_profiles:
+        age_diff = abs(current_profile.birth_year - profile.birth_year)
+        if age_diff > 5:
+            continue
+
+        if current_profile.user_id_fk == profile.user_id_fk:
+            continue
+
+        height_diff = abs(current_profile.height - profile.height)
+        if height_diff < 0.076 or height_diff > 0.254:
+            continue
+
+        match_fields = sum([
+            current_profile.fav_cuisine == profile.fav_cuisine,
+            current_profile.fav_colour == profile.fav_colour,
+            current_profile.fav_school_subject == profile.fav_school_subject,
+            current_profile.political == profile.political,
+            current_profile.religious == profile.religious,
+            current_profile.family_oriented == profile.family_oriented
+        ])
+
+        if match_fields >= 3:
+            matches.append(profile.to_dict())
+
+    return jsonify(matches), 200
 
 @app.after_request
 def add_header(response):
