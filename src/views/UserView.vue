@@ -70,13 +70,36 @@
         No profiles found.
     </div>
     </div>
-
+    
+    <div class="recent-profiles-container" v-if="recentProfiles.length">
+    <h2 class="recent-profiles-title">Recently Added Profiles</h2>
+    <div class="recent-profiles-grid">
+        <div class="profile-card" v-for="profile in recentProfiles" :key="profile.id">
+        <p><strong>ID:</strong> {{ profile.id }}</p>
+        <p><strong>Description:</strong> {{ profile.description }}</p>
+        <p><strong>Parish:</strong> {{ profile.parish }}</p>
+        <p><strong>Sex:</strong> {{ profile.sex }}</p>
+        <p><strong>Race:</strong> {{ profile.race }}</p>
+        <p><strong>Birth Year:</strong> {{ profile.birth_year }}</p>
+        <p><strong>Height:</strong> {{ profile.height }} m</p>
+        <p><strong>Favourite Cuisine:</strong> {{ profile.fav_cuisine }}</p>
+        <p><strong>Favourite Colour:</strong> {{ profile.fav_colour }}</p>
+        <p><strong>Favourite School Subject:</strong> {{ profile.fav_school_subject }}</p>
+        <p><strong>Political:</strong> {{ profile.political ? 'Yes' : 'No' }}</p>
+        <p><strong>Religious:</strong> {{ profile.religious ? 'Yes' : 'No' }}</p>
+        <p><strong>Family Oriented:</strong> {{ profile.family_oriented ? 'Yes' : 'No' }}</p>
+      </div>
+    </div>
+    </div>
+    <div v-else class="loading-message">Loading recent profiles...</div>
 </template>
   
 <script setup>
     import axios from 'axios'
     import { onMounted, ref, computed } from 'vue'
     import { useRouter, useRoute } from 'vue-router'
+    
+    const recentProfiles = ref([])
 
     const user = ref({})
     const profiles = ref([])
@@ -139,121 +162,172 @@
         }
     }
 
-const getPhotoUrl = (filename) => {
-    return `/pic_uploads/${filename}`
-}
-
-const fetchUser = async () => {
-    try {
-        const response = await axios.get(`/api/users/${userId}`)
-        user.value = response.data
-    } catch (err) {
-        console.error('Failed to fetch user:', err)
+    const getPhotoUrl = (filename) => {
+        return `/pic_uploads/${filename}`
     }
-}
 
-const fetchProfiles = async () => {
-    try {
-        loading.value = true
-        const response = await axios.get('/api/search')
-        profiles.value = response.data
-    } catch (err) {
-        console.error('Failed to fetch profiles:', err)
-        error.value = 'Failed to load profiles.'
-    } finally {
-        loading.value = false
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get(`/api/users/${userId}`)
+            user.value = response.data
+        } catch (err) {
+            console.error('Failed to fetch user:', err)
+        }
     }
-}
 
-const filteredProfiles = computed(() => {
-    if (!searchQuery.value) return profiles.value
-    const q = searchQuery.value.toLowerCase()
-    return profiles.value.filter((p) =>
-        (p.user?.name || '').toLowerCase().includes(q) ||
-        (p.sex || '').toLowerCase().includes(q) ||
-        (p.race || '').toLowerCase().includes(q) ||
-        String(p.birth_year).includes(q)
-    )
-})
+    const fetchProfiles = async () => {
+        try {
+            loading.value = true
+            const response = await axios.get('/api/search')
+            profiles.value = response.data
+        } catch (err) {
+            console.error('Failed to fetch profiles:', err)
+            error.value = 'Failed to load profiles.'
+        } finally {
+            loading.value = false
+        }
+    }
 
-onMounted(() => {
-    fetchUser()
-    fetchProfiles()
-})
+    const filteredProfiles = computed(() => {
+        if (!searchQuery.value) return profiles.value
+        const q = searchQuery.value.toLowerCase()
+        return profiles.value.filter((p) =>
+            (p.user?.name || '').toLowerCase().includes(q) ||
+            (p.sex || '').toLowerCase().includes(q) ||
+            (p.race || '').toLowerCase().includes(q) ||
+            String(p.birth_year).includes(q)
+        )
+    })
+
+
+    const fetchRecentProfiles = async () => {
+        try {
+            const response = await axios.get('/api/profiles')
+            const sorted = response.data.sort((a, b) => b.id - a.id)
+            recentProfiles.value = sorted.slice(0, 4)
+        } catch (err) {
+            console.error('Failed to fetch recent profiles:', err)
+        }
+    }
+
+    onMounted(() => {
+        fetchUser()
+        fetchProfiles()
+        fetchRecentProfiles()
+    })
+
+
+
 </script>
 
 
 
 
 <style scoped>
-.user-photo {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 1rem;
-}
+    .user-photo {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    }
 
-.action-buttons {
-  margin-top: 20px;
-}
+    .action-buttons {
+    margin-top: 20px;
+    }
 
-.action-buttons button {
-  padding: 10px 15px;
-  margin: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  background-color: #4CAF50;
-  color: white;
-  transition: background-color 0.3s ease;
-}
+    .action-buttons button {
+    padding: 10px 15px;
+    margin: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s ease;
+    }
 
-/* .search-bar {
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
-}
+    /* .search-bar {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    }
 
-.search-input {
-  padding: 0.5rem;
-  width: 100%;
-  max-width: 400px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
+    .search-input {
+    padding: 0.5rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    }
 
-.search-input::placeholder {
-  color: #aaa;
-} */
+    .search-input::placeholder {
+    color: #aaa;
+    } */
 
-.action-buttons button:hover {
-  background-color: #45a049;
-}
+    .recent-profiles-container {
+    margin-top: 2rem;
+    }
 
-.btn-profile {
-  background-color: #2196F3;
-}
+    .recent-profiles-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    }
 
-.btn-profile:hover {
-  background-color: #0b7dda;
-}
+    .recent-profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    }
 
-.btn-report {
-  background-color: #ff9800;
-}
+    .profile-card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+    }
 
-.btn-report:hover {
-  background-color: #e68900;
-}
+    .profile-card:hover {
+    transform: translateY(-4px);
+    }
 
-.btn-logout {
-  background-color: #f44336;
-}
+    .profile-card p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #333;
+    }
 
-.btn-logout:hover {
-  background-color: #d32f2f;
-}
+
+    .action-buttons button:hover {
+    background-color: #45a049;
+    }
+
+    .btn-profile {
+    background-color: #2196F3;
+    }
+
+    .btn-profile:hover {
+    background-color: #0b7dda;
+    }
+
+    .btn-report {
+    background-color: #ff9800;
+    }
+
+    .btn-report:hover {
+    background-color: #e68900;
+    }
+
+    .btn-logout {
+    background-color: #f44336;
+    }
+
+    .btn-logout:hover {
+    background-color: #d32f2f;
+    }
 </style>
